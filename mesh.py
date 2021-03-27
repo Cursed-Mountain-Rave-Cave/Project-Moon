@@ -16,6 +16,24 @@ class Mesh:
     def show(self):
         figure = pyplot.figure()
         axes = mplot3d.Axes3D(figure)
+        
+        n = 10
+        
+        x = np.linspace(-2, 2, n)
+        y = np.linspace(-2, 2, n)
+        z = np.linspace(-2, 2, n)
+
+        xv, yv, zv = np.meshgrid(x, y, z)
+        c = xv*xv + yv*yv + zv*zv
+        p = axes.scatter3D(
+            xv.flatten(),
+            yv.flatten(),
+            zv.flatten(),
+            s=2,
+            c=c.flatten()
+        )
+        figure.colorbar(p)
+        
         axes.add_collection3d(
             mplot3d.art3d.Poly3DCollection(
                 self.vectors, 
@@ -26,8 +44,8 @@ class Mesh:
             )
         )
         axes.auto_scale_xyz(
-            [np.min(self.x), np.max(self.x)], 
-            [np.min(self.y), np.max(self.y)], 
-            [np.min(self.z), np.max(self.z)]
+            [-2, 2],
+            [-2, 2],
+            [-2, 2],
         )
         pyplot.show()
