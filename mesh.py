@@ -44,33 +44,24 @@ class Mesh:
                     [c[0] - a[0], c[1] - a[1], c[2] - a[2]],
                 ]))
                 ae = linalg.det(np.array([
-                    [a[0] - x0, a[1] - y0, a[2] - z0],
-                    [b[0] - x0, b[1] - y0, b[2] - z0],
-                    [c[0] - x0, c[1] - y0, c[2] - z0],
-                ])) * linalg.det(np.array([
                     [x1   - x0, y1   - y0, z1   - z0],
                     [b[0] - x0, b[1] - y0, b[2] - z0],
                     [c[0] - x0, c[1] - y0, c[2] - z0],
                 ]))
                 be = linalg.det(np.array([
-                    [b[0] - x0, b[1] - y0, b[2] - z0],
                     [a[0] - x0, a[1] - y0, a[2] - z0],
-                    [c[0] - x0, c[1] - y0, c[2] - z0],
-                ])) * linalg.det(np.array([
                     [x1   - x0, y1   - y0, z1   - z0],
-                    [a[0] - x0, a[1] - y0, a[2] - z0],
                     [c[0] - x0, c[1] - y0, c[2] - z0],
                 ]))
                 ce = linalg.det(np.array([
-                    [c[0] - x0, c[1] - y0, c[2] - z0],
                     [a[0] - x0, a[1] - y0, a[2] - z0],
                     [b[0] - x0, b[1] - y0, b[2] - z0],
-                ])) * linalg.det(np.array([
                     [x1   - x0, y1   - y0, z1   - z0],
-                    [a[0] - x0, a[1] - y0, a[2] - z0],
-                    [b[0] - x0, b[1] - y0, b[2] - z0],
                 ]))
-                if se < 0 and ae > 0 and be > 0 and ce > 0:
+                if se < 0 and (
+                    ae > 0 and be > 0 and ce > 0
+                    or ae < 0 and be < 0 and ce < 0
+                ):
                     intersections_count += 1
             results.append(intersections_count % 2 == 1)
         

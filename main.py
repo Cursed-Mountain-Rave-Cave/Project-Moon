@@ -38,7 +38,7 @@ if __name__ == '__main__':
     print('Load mesh', (datetime.now() - t).total_seconds())
     t = datetime.now()
     
-    field = ScalarField(n=10)
+    field = ScalarField(n=20)
     
     print('Load field', (datetime.now() - t).total_seconds())
     t = datetime.now()
