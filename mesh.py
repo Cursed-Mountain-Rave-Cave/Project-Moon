@@ -1,7 +1,47 @@
 import stl
+import numba
 import numpy as np
 import numpy.linalg as linalg
 from mpl_toolkits import mplot3d
+
+
+@numba.njit([
+    'int8(float64, float64, float64, float64, float64, float64, float64[:], float64[:], float64[:])',
+    'int8(float32, float32, float32, float32, float32, float32, float32[:], float32[:], float32[:])'
+])
+def intersect(
+    x0, y0, z0,
+    x1, y1, z1,
+    a, b, c
+) -> bool:
+    se = linalg.det(np.array([
+        [x0   - a[0], y0   - a[1], z0   - a[2]],
+        [b[0] - a[0], b[1] - a[1], b[2] - a[2]],
+        [c[0] - a[0], c[1] - a[1], c[2] - a[2]],
+    ])) * linalg.det(np.array([
+        [x1   - a[0], y1   - a[1], z1   - a[2]],
+        [b[0] - a[0], b[1] - a[1], b[2] - a[2]],
+        [c[0] - a[0], c[1] - a[1], c[2] - a[2]],
+    ]))
+    ae = linalg.det(np.array([
+        [x1   - x0, y1   - y0, z1   - z0],
+        [b[0] - x0, b[1] - y0, b[2] - z0],
+        [c[0] - x0, c[1] - y0, c[2] - z0],
+    ]))
+    be = linalg.det(np.array([
+        [a[0] - x0, a[1] - y0, a[2] - z0],
+        [x1   - x0, y1   - y0, z1   - z0],
+        [c[0] - x0, c[1] - y0, c[2] - z0],
+    ]))
+    ce = linalg.det(np.array([
+        [a[0] - x0, a[1] - y0, a[2] - z0],
+        [b[0] - x0, b[1] - y0, b[2] - z0],
+        [x1   - x0, y1   - y0, z1   - z0],
+    ]))
+    return se < 0 and (
+        ae > 0 and be > 0 and ce > 0
+        or ae < 0 and be < 0 and ce < 0
+    )
 
 
 class Mesh:
@@ -34,35 +74,13 @@ class Mesh:
 
             intersections_count = 0
             for a, b, c in self.vectors:
-                se = linalg.det(np.array([
-                    [x0   - a[0], y0   - a[1], z0   - a[2]],
-                    [b[0] - a[0], b[1] - a[1], b[2] - a[2]],
-                    [c[0] - a[0], c[1] - a[1], c[2] - a[2]],
-                ])) * linalg.det(np.array([
-                    [x1   - a[0], y1   - a[1], z1   - a[2]],
-                    [b[0] - a[0], b[1] - a[1], b[2] - a[2]],
-                    [c[0] - a[0], c[1] - a[1], c[2] - a[2]],
-                ]))
-                ae = linalg.det(np.array([
-                    [x1   - x0, y1   - y0, z1   - z0],
-                    [b[0] - x0, b[1] - y0, b[2] - z0],
-                    [c[0] - x0, c[1] - y0, c[2] - z0],
-                ]))
-                be = linalg.det(np.array([
-                    [a[0] - x0, a[1] - y0, a[2] - z0],
-                    [x1   - x0, y1   - y0, z1   - z0],
-                    [c[0] - x0, c[1] - y0, c[2] - z0],
-                ]))
-                ce = linalg.det(np.array([
-                    [a[0] - x0, a[1] - y0, a[2] - z0],
-                    [b[0] - x0, b[1] - y0, b[2] - z0],
-                    [x1   - x0, y1   - y0, z1   - z0],
-                ]))
-                if se < 0 and (
-                    ae > 0 and be > 0 and ce > 0
-                    or ae < 0 and be < 0 and ce < 0
+                if intersect(
+                    x0, y0, z0,
+                    x1, y1, z1,
+                    a, b, c
                 ):
                     intersections_count += 1
+                
             results.append(intersections_count % 2 == 1)
         
         return np.mean(results) > 0.5

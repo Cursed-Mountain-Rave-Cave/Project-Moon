@@ -1,3 +1,5 @@
 numpy
-matplotlib ==3.4.0
+matplotlib==3.4.0
 numpy-stl
+numba
+scipy
