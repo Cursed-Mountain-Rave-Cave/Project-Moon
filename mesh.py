@@ -1,3 +1,4 @@
+from numba.misc.special import prange
 import stl
 import numba
 import numpy as np
@@ -6,8 +7,8 @@ from mpl_toolkits import mplot3d
 
 
 @numba.njit([
-    'int8(float64, float64, float64, float64, float64, float64, float64[:], float64[:], float64[:])',
-    'int8(float32, float32, float32, float32, float32, float32, float32[:], float32[:], float32[:])'
+    'int32(float64, float64, float64, float64, float64, float64, float64[:], float64[:], float64[:])',
+    'int32(float32, float32, float32, float32, float32, float32, float32[:], float32[:], float32[:])'
 ])
 def intersect(
     x0, y0, z0,
@@ -44,6 +45,26 @@ def intersect(
     )
 
 
+@numba.njit([
+    'int32(float64, float64, float64, float64, float64, float64, float64[:,:,:])',
+    'int32(float32, float32, float32, float32, float32, float32, float32[:,:,:])'
+])
+def intersections_count(
+    x0, y0, z0,
+    x1, y1, z1,
+    vectors
+):
+    count = 0
+    for a, b, c in vectors:
+        if intersect(
+            x0, y0, z0,
+            x1, y1, z1,
+            a, b, c
+        ):
+            count += 1
+    return count
+
+
 class Mesh:
 
     def __init__(self, filepath: str) -> None:
@@ -70,18 +91,8 @@ class Mesh:
             x1 = x0 + np.random.uniform(-l, l)
             y1 = y0 + np.random.uniform(-l, l)
             z1 = z0 + np.random.uniform(-l, l)
-            # TODO replace with sum with random vector with constant length
-
-            intersections_count = 0
-            for a, b, c in self.vectors:
-                if intersect(
-                    x0, y0, z0,
-                    x1, y1, z1,
-                    a, b, c
-                ):
-                    intersections_count += 1
-                
-            results.append(intersections_count % 2 == 1)
+            # TODO replace with sum with random vector with constant length                
+            results.append(intersections_count(x0, y0, z0, x1, y1, z1, self.vectors) % 2 == 1)
         
         return np.mean(results) > 0.5
 
