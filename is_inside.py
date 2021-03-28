@@ -3,17 +3,15 @@ import numba
 from tqdm import tqdm
 
 @numba.njit([
-    'float64[:](float64[:,:])',
-    'float32[:](float32[:,:])'
-])
+    'float64[:](float64[:,:])'
+], cache=True)
 def anorm2(X):
 	return numpy.sqrt(numpy.sum(X ** 2, axis = 1))
 
 
 @numba.njit([
-    'float64[:](float64[:,:],float64[:,:], float64[:,:])',
-    'float32[:](float32[:,:],float32[:,:], float32[:,:])',
-])
+    'float64[:](float64[:,:],float64[:,:], float64[:,:])'
+], cache=True)
 def adet(X, Y, Z):
 	ret  = numpy.multiply(numpy.multiply(X[:,0], Y[:,1]), Z[:,2])
 	ret += numpy.multiply(numpy.multiply(Y[:,0], Z[:,1]), X[:,2])
@@ -36,7 +34,7 @@ def is_inside_turbo(triangles, X):
 	ret = numpy.zeros(X.shape[0], dtype = X.dtype)
 	
 	# Accumulate generalized winding number for each triangle
-	for U, V, W in tqdm(triangles):	
+	for U, V, W in tqdm(triangles, desc='Preprocessing'):	
 		A, B, C = U - X, V - X, W - X
 		omega = adet(A, B, C)
 

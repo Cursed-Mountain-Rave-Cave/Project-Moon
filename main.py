@@ -36,7 +36,6 @@ if __name__ == '__main__':
     field = ScalarField(100, *borders[0], *borders[1], *borders[2])
     
     t = datetime.now()
-
     mask = mesh.contains_mask(
         field.xv, 
         field.yv, 
@@ -47,6 +46,6 @@ if __name__ == '__main__':
 
     field.mask = mask
     field.init_borders(15, 0)
-    field.iterate(n=1e3, precision=1e-4)
+    field.iterate(n=1e2, precision=1e-4)
 
     plot(mesh, field, borders)

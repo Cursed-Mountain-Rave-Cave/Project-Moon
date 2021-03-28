@@ -8,9 +8,8 @@ import is_inside
 
 
 @numba.njit([
-    'int32(float64, float64, float64, float64, float64, float64, float64[:], float64[:], float64[:])',
     'int32(float32, float32, float32, float32, float32, float32, float32[:], float32[:], float32[:])'
-])
+], cache=True)
 def intersect(
     x0, y0, z0,
     x1, y1, z1,
@@ -47,9 +46,8 @@ def intersect(
 
 
 @numba.njit([
-    'int32(float64, float64, float64, float64, float64, float64, float64[:,:,:])',
     'int32(float32, float32, float32, float32, float32, float32, float32[:,:,:])'
-])
+], cache=True)
 def intersections_count(
     x0, y0, z0,
     x1, y1, z1,
@@ -105,6 +103,7 @@ class Mesh:
                 for j in range(xv.shape[1]):
                     for k in range(xv.shape[2]):
                         X.append((xv[i, j, k], yv[i, j, k], zv[i, j, k]))
+
             return is_inside.is_inside_turbo(self.vectors, np.array(X)).reshape(xv.shape)
         else:
             return np.apply_along_axis(
