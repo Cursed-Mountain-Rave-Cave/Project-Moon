@@ -36,7 +36,7 @@ class ScalarField:
     def iterate(self, precision=0.0, n=10):
         sub_mask = self.mask[1:-1, 1:-1, 1:-1]
         dif = -1
-        for i in tqdm(range(int(n))):
+        for _ in tqdm(range(int(n))):
             new_f = (
                 self.f[:-2, 1:-1, 1:-1]
                 + self.f[2:, 1:-1, 1:-1]
@@ -44,18 +44,20 @@ class ScalarField:
                 + self.f[1:-1, 2:, 1:-1]
                 + self.f[1:-1, 1:-1, :-2]
                 + self.f[1:-1, 1:-1, 2:]
-            ) * (sub_mask == 0) / 6 + self.f[1:-1, 1:-1, 1:-1]* (sub_mask != 0)
+            ) * (sub_mask == 0) / 6 + self.f[1:-1, 1:-1, 1:-1] * (sub_mask != 0)
             dif = np.abs(new_f - self.f[1:-1, 1:-1, 1:-1]).max()
             self.f[1:-1, 1:-1, 1:-1] = new_f
             if dif < precision:
-                return
+                print("Difference is:",dif)
+                return 
+        print("Difference is:",dif)
 
     def plot(self, figure, axes):
         p = axes.scatter3D(
-            self.xv.flatten(),
-            self.yv.flatten(),
-            self.zv.flatten(),
+            self.xv[~self.mask].flatten()[::15],
+            self.yv[~self.mask].flatten()[::15],
+            self.zv[~self.mask].flatten()[::15],
             s=2,
-            c=self.f.flatten()
+            c=self.f[~self.mask].flatten()[::15]
         )
         figure.colorbar(p)

@@ -4,6 +4,7 @@ import numba
 import numpy as np
 import numpy.linalg as linalg
 from mpl_toolkits import mplot3d
+import is_inside
 
 
 @numba.njit([
@@ -96,16 +97,25 @@ class Mesh:
         
         return np.mean(results) > 0.5
 
-    def contains_mask(self, xv, yv, zv):
-        return np.apply_along_axis(
-            self.contains,
-            0,
-            np.array([
-                xv, 
-                yv, 
-                zv
-            ]),
-        )
+    def contains_mask(self, xv, yv, zv, fast_mode):
+        if fast_mode:
+            X = list()
+
+            for i in range(xv.shape[0]):
+                for j in range(xv.shape[1]):
+                    for k in range(xv.shape[2]):
+                        X.append((xv[i, j, k], yv[i, j, k], zv[i, j, k]))
+            return is_inside.is_inside_turbo(self.vectors, np.array(X)).reshape(xv.shape)
+        else:
+            return np.apply_along_axis(
+                self.contains,
+                0,
+                np.array([
+                    xv, 
+                    yv, 
+                    zv
+                ]),
+            )
 
     def plot(self, figure, axes):
         axes.add_collection3d(

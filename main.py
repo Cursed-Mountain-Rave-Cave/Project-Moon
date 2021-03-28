@@ -21,32 +21,32 @@ def plot(
     mesh.plot(figure, axes)
     field.plot(figure, axes)
 
-    l = 1.5
     axes.auto_scale_xyz(*borders)
     pyplot.show()
 
 
 if __name__ == '__main__':
+    l = 20
     borders = [
-        [-20, 20],
-        [-20, 20],
-        [-20, 20],
+        [-l, l],
+        [-l, l],
+        [-l, l],
     ]
     mesh = Mesh('meshes/satellite_cubic.stl')
-    field = ScalarField(30, *borders[0], *borders[1], *borders[2])
-    print(len(mesh.vectors))
+    field = ScalarField(100, *borders[0], *borders[1], *borders[2])
     
     t = datetime.now()
 
     mask = mesh.contains_mask(
         field.xv, 
         field.yv, 
-        field.zv
+        field.zv,
+        True
     )
     print('Calculate mask', (datetime.now() - t).total_seconds())
 
     field.mask = mask
     field.init_borders(15, 0)
-    field.iterate(n=1e5, precision=1e-6)
+    field.iterate(n=1e3, precision=1e-4)
 
     plot(mesh, field, borders)
