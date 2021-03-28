@@ -13,7 +13,10 @@ class Mesh:
         self.y = self.vectors[:, :, 1].flatten()
         self.z = self.vectors[:, :, 2].flatten()
 
-    def contains(self, x0, y0, z0) -> bool:
+    def contains(self, x0, y0 = None, z0 = None) -> bool:
+        if y0 is None and z0 is None:
+            x0, y0, z0 = x0
+        
         x1 = x0 + 11
         y1 = y0 + 7
         z1 = z0 + 5
@@ -60,6 +63,17 @@ class Mesh:
                 intersections_count += 1
         return intersections_count % 2 == 1
 
+    def contains_mask(self, xv, yv, zv):
+        return np.apply_along_axis(
+            self.contains,
+            0,
+            np.array([
+                xv, 
+                yv, 
+                zv
+            ]),
+        )
+
     def plot(self, figure, axes):
         axes.add_collection3d(
             mplot3d.art3d.Poly3DCollection(
@@ -67,6 +81,6 @@ class Mesh:
                 facecolors='w', 
                 edgecolors='k',
                 linewidths=1,
-                alpha=0.5
+                alpha=0.1
             )
         )

@@ -7,7 +7,8 @@ from mpl_toolkits import mplot3d
 
 def plot(
     mesh: Mesh, 
-    field: ScalarField
+    field: ScalarField,
+    mask
 ):
     figure = pyplot.figure()
     axes = mplot3d.Axes3D(
@@ -17,18 +18,25 @@ def plot(
     figure.add_axes(axes)
 
     mesh.plot(figure, axes)
-    field.plot(figure, axes)
+    field.plot(figure, axes, mask)
 
+    l = 1.5
     axes.auto_scale_xyz(
-        [-2, 2],
-        [-2, 2],
-        [-2, 2],
+        [-l, l],
+        [-l, l],
+        [-l, l],
     )
     pyplot.show()
 
 
 if __name__ == '__main__':
     mesh = Mesh('meshes/cube.stl')
-    field = ScalarField()
+    field = ScalarField(n=20)
 
-    plot(mesh, field)
+    mask = mesh.contains_mask(
+        field.xv, 
+        field.yv, 
+        field.zv
+    )
+
+    plot(mesh, field, mask)
