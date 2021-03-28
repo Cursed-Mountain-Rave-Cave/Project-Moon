@@ -10,7 +10,11 @@ def plot(
     field: ScalarField
 ):
     figure = pyplot.figure()
-    axes = mplot3d.Axes3D(figure)
+    axes = mplot3d.Axes3D(
+        figure,  
+        auto_add_to_figure=False
+    )
+    figure.add_axes(axes)
 
     mesh.plot(figure, axes)
     field.plot(figure, axes)
