@@ -30,13 +30,25 @@ def plot(
 
 
 if __name__ == '__main__':
+    from datetime import datetime
+    t = datetime.now()
+
     mesh = Mesh('meshes/cube.stl')
-    field = ScalarField(n=20)
+    
+    print('Load mesh', (datetime.now() - t).total_seconds())
+    t = datetime.now()
+    
+    field = ScalarField(n=10)
+    
+    print('Load field', (datetime.now() - t).total_seconds())
+    t = datetime.now()
 
     mask = mesh.contains_mask(
         field.xv, 
         field.yv, 
         field.zv
     )
+    
+    print('Calculate mask', (datetime.now() - t).total_seconds())
 
     plot(mesh, field, mask)
