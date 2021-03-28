@@ -28,12 +28,13 @@ def plot(
 
 if __name__ == '__main__':
     borders = [
-        [-5, 5],
-        [-5, 5],
-        [-5, 5],
+        [-20, 20],
+        [-20, 20],
+        [-20, 20],
     ]
-    mesh = Mesh('meshes/cube.stl')
-    field = ScalarField(20, *borders[0], *borders[1], *borders[2])
+    mesh = Mesh('meshes/satellite_cubic.stl')
+    field = ScalarField(30, *borders[0], *borders[1], *borders[2])
+    print(len(mesh.vectors))
     
     t = datetime.now()
 
