@@ -80,12 +80,12 @@ class Mesh:
         y0 = None, 
         z0 = None, 
         n_tries=3,
-        l = 10
     ) -> bool:
         if y0 is None and z0 is None:
             x0, y0, z0 = x0
         
         results = list()
+        l = 4*(self.vectors.max() - self.vectors.min())
 
         for _ in range(n_tries):
             x1 = x0 + np.random.uniform(-l, l)

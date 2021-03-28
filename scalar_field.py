@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 
 class ScalarField:
@@ -20,14 +21,41 @@ class ScalarField:
         self.z = np.linspace(z_min, z_max, self.n)
 
         self.xv, self.yv, self.zv = np.meshgrid(self.x, self.y, self.z)
-        self.c = 1 / (1 + self.xv**2 + self.yv**2 + self.zv**2)
+        self.f = np.zeros(self.xv.shape)
+        self.mask = np.zeros(self.xv.shape, dtype=np.int32)
 
-    def plot(self, figure, axes, mask):
+    def init_borders(self, f_inner, f_border):
+        self.f[0, :, :] = f_border
+        self.f[-1, :, :] = f_border
+        self.f[:, 0, :] = f_border
+        self.f[:, -1, :] = f_border
+        self.f[:, :, 0] = f_border
+        self.f[:, :, -1] = f_border
+        self.f[self.mask] = f_inner
+
+    def iterate(self, precision=0.0, n=10):
+        sub_mask = self.mask[1:-1, 1:-1, 1:-1]
+        dif = -1
+        for i in tqdm(range(int(n))):
+            new_f = (
+                self.f[:-2, 1:-1, 1:-1]
+                + self.f[2:, 1:-1, 1:-1]
+                + self.f[1:-1, :-2, 1:-1]
+                + self.f[1:-1, 2:, 1:-1]
+                + self.f[1:-1, 1:-1, :-2]
+                + self.f[1:-1, 1:-1, 2:]
+            ) * (sub_mask == 0) / 6 + self.f[1:-1, 1:-1, 1:-1]* (sub_mask != 0)
+            dif = np.abs(new_f - self.f[1:-1, 1:-1, 1:-1]).max()
+            self.f[1:-1, 1:-1, 1:-1] = new_f
+            if dif < precision:
+                return
+
+    def plot(self, figure, axes):
         p = axes.scatter3D(
-            self.xv[mask].flatten(),
-            self.yv[mask].flatten(),
-            self.zv[mask].flatten(),
+            self.xv.flatten(),
+            self.yv.flatten(),
+            self.zv.flatten(),
             s=2,
-            c=self.c[mask].flatten()
+            c=self.f.flatten()
         )
         figure.colorbar(p)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from stl import mesh
 from mesh import Mesh
 from scalar_field import ScalarField
@@ -8,7 +9,7 @@ from mpl_toolkits import mplot3d
 def plot(
     mesh: Mesh, 
     field: ScalarField,
-    mask
+    borders
 ):
     figure = pyplot.figure()
     axes = mplot3d.Axes3D(
@@ -18,29 +19,22 @@ def plot(
     figure.add_axes(axes)
 
     mesh.plot(figure, axes)
-    field.plot(figure, axes, mask)
+    field.plot(figure, axes)
 
     l = 1.5
-    axes.auto_scale_xyz(
-        [-l, l],
-        [-l, l],
-        [-l, l],
-    )
+    axes.auto_scale_xyz(*borders)
     pyplot.show()
 
 
 if __name__ == '__main__':
-    from datetime import datetime
-    t = datetime.now()
-
+    borders = [
+        [-5, 5],
+        [-5, 5],
+        [-5, 5],
+    ]
     mesh = Mesh('meshes/cube.stl')
+    field = ScalarField(20, *borders[0], *borders[1], *borders[2])
     
-    print('Load mesh', (datetime.now() - t).total_seconds())
-    t = datetime.now()
-    
-    field = ScalarField(n=20)
-    
-    print('Load field', (datetime.now() - t).total_seconds())
     t = datetime.now()
 
     mask = mesh.contains_mask(
@@ -48,7 +42,10 @@ if __name__ == '__main__':
         field.yv, 
         field.zv
     )
-    
     print('Calculate mask', (datetime.now() - t).total_seconds())
 
-    plot(mesh, field, mask)
+    field.mask = mask
+    field.init_borders(15, 0)
+    field.iterate(n=1e5, precision=1e-6)
+
+    plot(mesh, field, borders)
