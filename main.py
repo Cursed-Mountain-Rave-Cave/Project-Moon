@@ -33,7 +33,7 @@ if __name__ == '__main__':
         [-l, l],
     ]
     mesh = Mesh('meshes/satellite_cubic.stl')
-    field = ScalarField(100, *borders[0], *borders[1], *borders[2])
+    field = ScalarField(50, *borders[0], *borders[1], *borders[2])
     
     t = datetime.now()
     mask = mesh.contains_mask(

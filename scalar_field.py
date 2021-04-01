@@ -56,11 +56,14 @@ class ScalarField:
         print("MAE is:", dif)
 
     def plot(self, figure, axes):
+        k = 20
+        # m = ~self.mask[k:,:,:]
+        m = self.f[k:,:,:] > 1
         p = axes.scatter3D(
-            self.xv[~self.mask].flatten(),
-            self.yv[~self.mask].flatten(),
-            self.zv[~self.mask].flatten(),
+            self.xv[k:,:,:][m].flatten()[::],
+            self.yv[k:,:,:][m].flatten()[::],
+            self.zv[k:,:,:][m].flatten()[::],
             s=2,
-            c=self.f[~self.mask].flatten()
+            c=self.f[k:,:,:][m].flatten()[::]
         )
         figure.colorbar(p)
